@@ -1,0 +1,36 @@
+#!/bin/bash
+
+export name="ruby27-sandbox"
+export volume="`pwd`/volume"
+export port="3000"
+
+
+#-- functions --------------------------------------------------------------------
+show_help() {
+    echo "Usage:"
+    echo "  $0                - Start shell inside container."
+    echo "  $0 root           - Start shell inside container with root."
+    echo "  $0 start          - Start container."
+    echo "  $0 recreate       - Recreate container."
+
+}
+
+#-- main -------------------------------------------------------------------------
+if [[ $1 == "start" ]]; then
+    docker-compose -f ${name}/docker-compose.yml -p ${name} up -d
+
+elif [[ $1 == "recreate" ]]; then
+    docker stop ${name}
+    docker rm   ${name}
+    docker-compose -f ${name}/docker-compose.yml -p ${name} up -d --build
+
+elif [[ $1 == "root" ]]; then
+    docker exec -it -u root -w /root ${name} bash --login
+
+elif [[ $1 == "help" ]]; then
+    show_help
+
+else
+    docker exec -it ${name} bash --login
+fi
+
